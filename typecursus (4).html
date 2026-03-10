@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filosofie Typecursus</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@400;500&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --surface2: #1c1c1c;
+    --border: #2a2a2a;
+    --text: #e8e0d0;
+    --text-dim: #6b6560;
+    --text-muted: #3a3530;
+    --accent: #c9a84c;
+    --accent-dim: #7a6530;
+    --correct: #5a8a5a;
+    --error: #c05050;
+    --error-bg: #2a1010;
+    --cursor: #c9a84c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    letter-spacing: 0.02em;
+  }
+
+  /* Subtle grid texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(201,168,76,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 820px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .stat {
+    flex: 1;
+    text-align: center;
+    padding: 16px 12px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+
+  .stat:last-child { border-right: none; }
+
+  .stat-value {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* Level indicator */
+  .level-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 0 2px;
+  }
+
+  .level-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .level-dots {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .level-dot {
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+
+  .level-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 8px var(--accent-dim);
+  }
+
+  .level-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* Philosopher source */
+  .philosopher {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .philosopher span {
+    color: var(--accent-dim);
+  }
+
+  /* Typing area */
+  .typing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 36px 40px;
+    margin-bottom: 20px;
+    position: relative;
+    min-height: 120px;
+  }
+
+  .typing-card::before {
+    content: '"';
+    position: absolute;
+    top: 12px;
+    left: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 60px;
+    color: var(--text-muted);
+    line-height: 1;
+  }
+
+  .text-display {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 18px;
+    line-height: 1.8;
+    letter-spacing: 0.05em;
+    word-break: break-word;
+    padding-top: 8px;
+  }
+
+  .char {
+    position: relative;
+    transition: color 0.05s;
+  }
+
+  .char.correct { color: var(--correct); }
+  .char.error {
+    color: var(--error);
+    background: var(--error-bg);
+    border-radius: 2px;
+  }
+  .char.pending { color: var(--text-dim); }
+  .char.cursor {
+    position: relative;
+  }
+  .char.cursor::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 2px;
+    bottom: 2px;
+    width: 2px;
+    background: var(--cursor);
+    animation: blink 1s step-end infinite;
+    box-shadow: 0 0 6px var(--cursor);
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Input (hidden but functional) */
+  #typing-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px;
+    height: 1px;
+  }
+
+  /* Click to start overlay */
+  .start-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13,13,13,0.7);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .start-overlay:hover { background: rgba(13,13,13,0.5); }
+
+  .start-overlay.hidden { display: none; }
+
+  .start-text {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    padding: 12px 24px;
+  }
+
+  /* Progress bar */
+  .progress-track {
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px var(--accent-dim);
+  }
+
+  /* Buttons */
+  .controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  button {
+    font-family: 'Lato', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    padding: 14px 32px;
+    font-weight: 400;
+  }
+
+  .btn-primary:hover {
+    background: #e0bb5a;
+    box-shadow: 0 0 20px rgba(201,168,76,0.3);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-dim);
+    padding: 14px 24px;
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--text-dim);
+    color: var(--text);
+  }
+
+  /* Flash feedback na voltooien */
+  .results-screen {
+    display: none;
+    background: linear-gradient(135deg, #1a1500, #0d0d0d);
+    border: 1px solid var(--accent-dim);
+    padding: 14px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .results-screen.show { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-grade {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .result-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* Unlocked level message */
+  .level-up {
+    display: none;
+    background: linear-gradient(135deg, #1a1500, #0d0d0d);
+    border: 1px solid var(--accent-dim);
+    padding: 16px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .level-up.show { display: block; }
+
+  .level-up-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--accent);
+  }
+
+  /* Naam rechtsboven */
+  .branding {
+    position: fixed;
+    top: 20px;
+    right: 28px;
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    z-index: 100;
+  }
+
+  /* Baseline balk */
+  .baseline-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid var(--accent-dim);
+    padding: 7px 16px;
+    margin-bottom: 16px;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+  }
+  .baseline-label {
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .baseline-val {
+    font-family: 'Source Code Pro', monospace;
+    color: var(--accent);
+  }
+  .baseline-sep { color: var(--text-muted); }
+
+  /* Fase indicator */
+  .fase-indicator {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    text-align: center;
+    margin-bottom: 10px;
+    min-height: 16px;
+  }
+
+  /* Progressierapport */
+  .progress-report {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 40px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.4s ease;
+    text-align: center;
+  }
+  .pr-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+  }
+  .pr-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .pr-col {
+    text-align: center;
+    min-width: 110px;
+  }
+  .pr-col-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+  .pr-stat {
+    margin-bottom: 8px;
+  }
+  .pr-stat span {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 32px;
+    color: var(--text);
+    display: block;
+    line-height: 1;
+  }
+  .pr-stat small {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .pr-col-diff .pr-stat span {
+    color: var(--accent);
+  }
+  .pr-arrow {
+    font-size: 20px;
+    color: var(--text-muted);
+    align-self: center;
+  }
+  .pr-message {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--text-dim);
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+
+    font-family: 'Source Code Pro', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 0.1em;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Naam rechtsboven -->
+  <div class="branding">RA ZA</div>
+
+  <header>
+    <div class="logo">MBO Typecursus</div>
+    <h1>Denken door <em>typen</em></h1>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-value" id="wpm-display">0</span>
+      <span class="stat-label">Gem. WPM</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="accuracy-display">100%</span>
+      <span class="stat-label">Nauwkeurigheid</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="streak-display">0</span>
+      <span class="stat-label">Reeks</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="total-display">0</span>
+      <span class="stat-label">Voltooid</span>
+    </div>
+  </div>
+
+  <!-- Level bar -->
+  <div class="level-bar">
+    <span class="level-label">Niveau</span>
+    <div class="level-dots" id="level-dots"></div>
+    <span class="level-name" id="level-name">Beginner</span>
+  </div>
+
+  <!-- Level up message -->
+  <div class="level-up" id="level-up-msg">
+    <span class="level-up-text" id="level-up-text">Niveau ontgrendeld!</span>
+  </div>
+
+  <!-- Baseline (zichtbaar na beginmeting) -->
+  <div class="baseline-bar" id="baseline-bar" style="display:none">
+    <span class="baseline-label">Beginmeting</span>
+    <span class="baseline-val" id="baseline-wpm-label">— WPM</span>
+    <span class="baseline-sep">·</span>
+    <span class="baseline-val" id="baseline-acc-label">— %</span>
+  </div>
+
+  <!-- Fase-indicator -->
+  <div class="fase-indicator" id="fase-indicator"></div>
+
+  <!-- Philosopher -->
+  <div class="philosopher" id="philosopher-display">
+    Klaar om te beginnen
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+
+  <!-- Timer -->
+  <div class="timer-display" id="timer-display">— : —</div>
+
+  <!-- Typing card -->
+  <div class="typing-card" id="typing-card">
+    <div class="text-display" id="text-display"></div>
+    <input type="text" id="typing-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  </div>
+
+  <!-- Flash feedback na voltooien -->
+  <div class="results-screen" id="results-screen">
+    <div class="result-grade" id="result-grade"></div>
+    <div class="result-quote" id="result-feedback"></div>
+  </div>
+
+  <!-- Progressiescherm (na eindmeting) -->
+  <div class="progress-report" id="progress-report" style="display:none">
+    <div class="pr-title">Sessierapport</div>
+    <div class="pr-grid">
+      <div class="pr-col">
+        <div class="pr-col-label">Beginmeting</div>
+        <div class="pr-stat"><span id="pr-start-wpm">—</span><small>WPM</small></div>
+        <div class="pr-stat"><span id="pr-start-acc">—</span><small>nauwkeurigheid</small></div>
+      </div>
+      <div class="pr-arrow">→</div>
+      <div class="pr-col">
+        <div class="pr-col-label">Eindmeting</div>
+        <div class="pr-stat"><span id="pr-end-wpm">—</span><small>WPM</small></div>
+        <div class="pr-stat"><span id="pr-end-acc">—</span><small>nauwkeurigheid</small></div>
+      </div>
+      <div class="pr-arrow">→</div>
+      <div class="pr-col pr-col-diff">
+        <div class="pr-col-label">Verschil</div>
+        <div class="pr-stat"><span id="pr-diff-wpm">—</span><small>WPM</small></div>
+        <div class="pr-stat"><span id="pr-diff-acc">—</span><small>nauwkeurigheid</small></div>
+      </div>
+    </div>
+    <div class="pr-message" id="pr-message"></div>
+    <div class="controls" style="margin-top:24px">
+      <button class="btn-primary" onclick="resetSession()">Nieuwe sessie</button>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls" id="main-controls">
+    <button class="btn-secondary" onclick="changeLevel(-1)">← Niveau</button>
+    <button class="btn-secondary" onclick="changeLevel(1)">Niveau →</button>
+    <button class="btn-secondary" onclick="resetSession()">Sessie resetten</button>
+  </div>
+</div>
+
+<script>
+// =====================
+// DATA: Filosofische teksten per niveau
+// =====================
+const LEVELS = [
+  {
+    name: "Beginner",
+    description: "Korte zinnen, eenvoudige woorden",
+    minWPM: 0, targetWPM: 25,
+  },
+  {
+    name: "Leerling",
+    description: "Iets langere zinnen",
+    minWPM: 20, targetWPM: 35,
+  },
+  {
+    name: "Denker",
+    description: "Complexere filosofische teksten",
+    minWPM: 30, targetWPM: 50,
+  },
+  {
+    name: "Filosoof",
+    description: "Lange, rijke zinnen",
+    minWPM: 45, targetWPM: 65,
+  },
+  {
+    name: "Meester",
+    description: "Volledige passages",
+    minWPM: 60, targetWPM: 999,
+  }
+];
+
+// =====================
+// TEKSTEN PER NIVEAU
+// Thema's: social media, werk & stage, vrienden & relaties
+// Stijl: mix van normaal en informeel Nederlands
+// =====================
+
+const TEKSTEN = {
+  0: [
+    // Social media
+    { text: "Je zet je telefoon neer en gaat slapen.", thema: "social media" },
+    { text: "Hij post elke dag een foto op Instagram.", thema: "social media" },
+    { text: "Ze heeft meer dan duizend volgers op TikTok.", thema: "social media" },
+    { text: "Ik check mijn telefoon als ik wakker word.", thema: "social media" },
+    { text: "Een like voelt goed, maar het duurt maar even.", thema: "social media" },
+    { text: "Hij stuurt haar een berichtje, maar ze reageert niet.", thema: "social media" },
+    { text: "Ze scrolt door haar feed en wordt er moe van.", thema: "social media" },
+    { text: "Je ziet alleen de mooie dingen van anderen online.", thema: "social media" },
+    // Werk & stage
+    { text: "Morgen begin ik met mijn stage.", thema: "werk" },
+    { text: "Ze vergeet haar pauze te nemen.", thema: "werk" },
+    { text: "Hij is te laat op zijn eerste werkdag.", thema: "werk" },
+    { text: "De baas vraagt of je volgende week extra wil werken.", thema: "werk" },
+    { text: "Ze zet koffie voor haar collega's.", thema: "werk" },
+    { text: "Op stage leer je dingen die je op school niet leert.", thema: "werk" },
+    { text: "Hij vraagt zijn begeleider om feedback.", thema: "werk" },
+    { text: "Je eerste salaris voelt als een beloning.", thema: "werk" },
+    // Vrienden & relaties
+    { text: "Ze belt haar beste vriend als ze zich rot voelt.", thema: "vrienden" },
+    { text: "Hij is er altijd als je hem nodig hebt.", thema: "vrienden" },
+    { text: "Ze maken ruzie maar lossen het snel op.", thema: "vrienden" },
+    { text: "Een goede vriend luistert zonder te oordelen.", thema: "vrienden" },
+    { text: "Ze gaan samen naar het park en praten bij.", thema: "vrienden" },
+    { text: "Hij mist zijn vrienden als hij te lang alleen is.", thema: "vrienden" },
+    { text: "Ze sturen elkaar grappige filmpjes de hele dag.", thema: "vrienden" },
+    { text: "Echte vrienden zeggen ook als je ongelijk hebt.", thema: "vrienden" },
+  ],
+  1: [
+    // Social media
+    { text: "Ze wil meer volgers, maar weet niet wat ze moet posten.", thema: "social media" },
+    { text: "Hij vergelijkt zijn leven met wat hij online ziet en voelt zich tekort schieten.", thema: "social media" },
+    { text: "Elke keer als ze een foto plaatst, wacht ze gespannen op de eerste reacties.", thema: "social media" },
+    { text: "Hij zet zijn telefoon op stil tijdens het eten, maar pakt hem toch steeds op.", thema: "social media" },
+    { text: "Ze doet mee aan een trend op TikTok, ook al vindt ze hem eigenlijk stom.", thema: "social media" },
+    { text: "Hij heeft tweehonderd vrienden online maar voelt zich soms erg alleen.", thema: "social media" },
+    { text: "Een negatief commentaar onder haar foto blijft de hele dag in haar hoofd zitten.", thema: "social media" },
+    { text: "Ze weet niet meer of ze iets echt leuk vindt of alleen maar omdat iedereen het deelt.", thema: "social media" },
+    // Werk & stage
+    { text: "Op zijn stageplek doet hij altijd iets extra's, ook als niemand erom vraagt.", thema: "werk" },
+    { text: "Ze durft haar begeleider geen vragen te stellen uit angst om dom over te komen.", thema: "werk" },
+    { text: "Hij krijgt kritiek van zijn baas en weet niet hoe hij daarmee om moet gaan.", thema: "werk" },
+    { text: "Ze werkt hard, maar vraagt zich af of ze ooit genoeg zal verdienen voor een eigen plek.", thema: "werk" },
+    { text: "Hij voelt zich onzeker op stage omdat zijn collega's veel meer ervaring hebben.", thema: "werk" },
+    { text: "Ze maakt een fout op het werk en besluit het eerlijk te vertellen aan haar baas.", thema: "werk" },
+    { text: "Op zijn stageplek ziet hij hoe het er echt aan toegaat in zijn toekomstige beroep.", thema: "werk" },
+    { text: "Ze vraagt om een dag vrij, maar durft nauwelijks te zeggen waarom ze die nodig heeft.", thema: "werk" },
+    // Vrienden & relaties
+    { text: "Hij vertelt zijn beste vriend iets wat hij aan niemand anders durft te zeggen.", thema: "vrienden" },
+    { text: "Ze merkt dat haar vriendin de laatste tijd anders doet en vraagt zich af wat er speelt.", thema: "vrienden" },
+    { text: "Hij wil er zijn voor zijn vriend, maar weet niet wat hij moet zeggen als het slecht gaat.", thema: "vrienden" },
+    { text: "Ze heeft moeite om nee te zeggen tegen haar vrienden, ook als ze er zelf niet op zit.", thema: "vrienden" },
+    { text: "Hij voelt dat de vriendschap minder wordt, maar niemand praat er openlijk over.", thema: "vrienden" },
+    { text: "Ze maakt een grapje op zijn kosten en merkt later dat hij er echt mee zat.", thema: "vrienden" },
+    { text: "Hij zegt sorry, ook al vindt hij dat hij gelijk had, want de vriendschap telt meer.", thema: "vrienden" },
+    { text: "Ze probeert haar vriend te steunen, maar weet niet altijd wat hij van haar nodig heeft.", thema: "vrienden" },
+  ],
+  2: [
+    // Social media
+    { text: "Hij besteedt meer dan drie uur per dag aan zijn telefoon, maar heeft het gevoel dat hij nergens tijd voor heeft.", thema: "social media" },
+    { text: "Ze plaatst een eerlijke foto zonder filter en is verrast door de positieve reacties die ze krijgt.", thema: "social media" },
+    { text: "Hij volgt alleen mensen die er perfect uitzien en vraagt zich daarna af waarom hij zich zo onzeker voelt.", thema: "social media" },
+    { text: "Ze wil stoppen met sociale media, maar als ze de app verwijdert voelt ze meteen dat ze iets mist.", thema: "social media" },
+    { text: "Hij heeft geleerd dat het aantal likes niets zegt over wie je bent als persoon.", thema: "social media" },
+    { text: "Ze ziet online dat haar vrienden iets leuks doen zonder haar en voelt een steek van jaloezie.", thema: "social media" },
+    { text: "Hij realiseert zich dat hij mensen online aardiger behandelt als ze veel volgers hebben.", thema: "social media" },
+    { text: "Ze besluit een week niet op haar telefoon te kijken en ontdekt hoeveel tijd ze normaal kwijt is.", thema: "social media" },
+    // Werk & stage
+    { text: "Op zijn stage leert hij dat een goede collega niet iemand is die altijd ja zegt, maar iemand die eerlijk is.", thema: "werk" },
+    { text: "Ze vraagt door als ze iets niet begrijpt, ook al is ze bang om lastig gevonden te worden.", thema: "werk" },
+    { text: "Hij merkt dat hij op zijn stageplek al snel behandeld wordt zoals hij zichzelf presenteert.", thema: "werk" },
+    { text: "Ze vindt haar stage niet leuk maar gaat toch elke dag, omdat ze weet dat doorzetten iets oplevert.", thema: "werk" },
+    { text: "Hij ziet hoe zijn collega altijd rustig blijft onder druk en besluit dat te leren van hem.", thema: "werk" },
+    { text: "Ze krijgt een compliment van haar begeleider en merkt dat ze dat echt nodig had.", thema: "werk" },
+    { text: "Hij snapt nu waarom zijn leraar altijd zei dat houding op de werkvloer net zo belangrijk is als kennis.", thema: "werk" },
+    { text: "Ze vraagt zichzelf af wat ze wil bereiken in haar loopbaan en beseft dat ze er nog nooit echt over heeft nagedacht.", thema: "werk" },
+    // Vrienden & relaties
+    { text: "Ze heeft geleerd dat goede vrienden niet altijd zeggen wat je wil horen, maar wel wat je nodig hebt.", thema: "vrienden" },
+    { text: "Hij merkt dat hij altijd degene is die belt, nooit de ander, en vraagt zich af wat dat betekent.", thema: "vrienden" },
+    { text: "Ze heeft een vriend die haar altijd laat twijfelen aan zichzelf en begint te beseffen wat dat met haar doet.", thema: "vrienden" },
+    { text: "Hij wil een eerlijk gesprek voeren met zijn vriend, maar is bang dat de vriendschap er niet tegen kan.", thema: "vrienden" },
+    { text: "Ze begrijpt nu dat je in een vriendschap soms iets moet geven zonder er iets voor terug te verwachten.", thema: "vrienden" },
+    { text: "Hij is er voor zijn vriend als het slecht gaat, ook als hij zelf ook niet zo lekker in zijn vel zit.", thema: "vrienden" },
+    { text: "Ze heeft iemand nodig die eerlijk is, niet iemand die altijd bevestigt wat ze al denkt.", thema: "vrienden" },
+    { text: "Hij realiseert zich dat hij moeite heeft om anderen toe te laten en vraagt zich af waar dat vandaan komt.", thema: "vrienden" },
+  ],
+  3: [
+    // Social media
+    { text: "Ze vraagt zich af of ze haar mening echt zelf heeft gevormd, of dat het algoritme gewoon heeft bepaald wat ze te zien kreeg.", thema: "social media" },
+    { text: "Hij post iets wat hij echt denkt en krijgt negatieve reacties, maar besluit zijn mening niet te veranderen om erbij te horen.", thema: "social media" },
+    { text: "Ze merkt dat ze online een versie van zichzelf presenteert die ze in het echte leven niet altijd kan waarmaken.", thema: "social media" },
+    { text: "Hij wil iets zeggen over een situatie die hem raakt, maar durft het niet te posten uit angst voor wat anderen ervan vinden.", thema: "social media" },
+    { text: "Ze begrijpt dat aandacht op sociale media verslavend werkt, maar vindt het moeilijk om er bewust mee om te gaan.", thema: "social media" },
+    { text: "Hij vraagt zich af wat er overblijft van zijn identiteit als je alles weghaalt wat hij online heeft gedeeld.", thema: "social media" },
+    { text: "Ze beseft dat ze anderen beoordeelt op hun online profiel, terwijl ze zelf ook maar een deel van haar leven laat zien.", thema: "social media" },
+    { text: "Hij zet zijn telefoon bewust weg als hij bij vrienden is en merkt hoe anders het gesprek dan wordt.", thema: "social media" },
+    // Werk & stage
+    { text: "Ze weet dat ze op stage fouten mag maken, maar de druk om het goed te doen voelt soms zo groot dat ze liever niets doet.", thema: "werk" },
+    { text: "Hij merkt dat zijn werkgever niet alleen kijkt naar wat hij kan, maar ook naar hoe hij omgaat met andere mensen op de werkvloer.", thema: "werk" },
+    { text: "Ze heeft een collega die het werk prima doet maar nooit een woord zegt en vraagt zich af of dat ook een keuze kan zijn.", thema: "werk" },
+    { text: "Hij krijgt een taak die hij niet leuk vindt en leert dat verantwoordelijkheid soms betekent dat je iets doet zonder dat je er zin in hebt.", thema: "werk" },
+    { text: "Ze vraagt zichzelf af of ze werk kiest omdat ze er goed in is, of omdat anderen verwachten dat ze het gaat doen.", thema: "werk" },
+    { text: "Hij ziet hoe zijn stagebegeleider omgaat met een lastige situatie en begrijpt dat ervaring iets is wat je niet kunt overnemen, alleen maar opdoen.", thema: "werk" },
+    { text: "Ze merkt dat eerlijk zijn op het werk soms meer kost dan zwijgen, maar dat het haar ook meer respect oplevert.", thema: "werk" },
+    { text: "Hij wil doorgroeien in zijn werk, maar vraagt zich af of hij bereid is te investeren in dingen die nu geen direct resultaat geven.", thema: "werk" },
+    // Vrienden & relaties
+    { text: "Ze realiseert zich dat ze mensen in haar leven heeft toegelaten die haar energie opslokken in plaats van geven.", thema: "vrienden" },
+    { text: "Hij heeft moeite om te zeggen wat hij echt voelt, ook bij zijn beste vrienden, en merkt hoe dat hem isoleert.", thema: "vrienden" },
+    { text: "Ze begrijpt nu dat vriendschap niet alleen betekent er zijn als het leuk is, maar ook als het ongemakkelijk of moeilijk wordt.", thema: "vrienden" },
+    { text: "Hij vraagt zich af of hij vrienden heeft die hem kennen zoals hij echt is, of alleen zoals hij zich online presenteert.", thema: "vrienden" },
+    { text: "Ze heeft een vriend verloren na een eerlijk gesprek en vraagt zich af of dat eerlijkheid de moeite waard maakt.", thema: "vrienden" },
+    { text: "Hij merkt dat hij mensen wil helpen, maar soms niet weet wanneer hij moet stoppen om ook voor zichzelf te zorgen.", thema: "vrienden" },
+    { text: "Ze heeft geleerd dat je niet van iedereen gehouden hoeft te worden, maar dat je wel zorgvuldig moet zijn met wie je dichtbij laat.", thema: "vrienden" },
+    { text: "Hij begrijpt nu dat je iemand kunt missen zonder dat je hem terug moet halen in je leven.", thema: "vrienden" },
+  ],
+  4: [
+    // Social media
+    { text: "Ze heeft jaren haar leven gedeeld op sociale media en vraagt zich nu af wie ze is los van die beelden, los van de reacties, los van de verwachtingen die ze zelf heeft opgebouwd.", thema: "social media" },
+    { text: "Hij gebruikt zijn platform om iets te zeggen wat er echt toe doet, ook al weet hij dat niet iedereen het ermee eens zal zijn, en ook al kost hem dat volgers.", thema: "social media" },
+    { text: "Ze merkt dat ze steeds meer tijd besteedt aan het curatoren van haar online leven en steeds minder tijd aan het leven zelf, en dat die balans haar begint te storen.", thema: "social media" },
+    { text: "Hij heeft geleerd dat online populariteit en echte verbinding twee verschillende dingen zijn, en dat je het een kunt hebben zonder het ander.", thema: "social media" },
+    { text: "Ze vraagt haar volgers om eerlijk commentaar en schrikt van wat ze te horen krijgt, maar besluit er iets mee te doen in plaats van het weg te klikken.", thema: "social media" },
+    { text: "Hij bedenkt dat het recht op een mening online niet hetzelfde is als het recht om iemand pijn te doen, en dat die grens vaker overschreden wordt dan mensen zich realiseren.", thema: "social media" },
+    // Werk & stage
+    { text: "Ze heeft op haar stage ontdekt dat ze goed is in iets wat ze nooit had verwacht, en dat die ontdekking haar kijk op haar eigen toekomst volledig heeft veranderd.", thema: "werk" },
+    { text: "Hij begrijpt nu dat een goede werkhouding niet betekent dat je altijd het hardste werkt, maar dat je betrouwbaar bent, communiceert en verantwoordelijkheid neemt voor je eigen gedrag.", thema: "werk" },
+    { text: "Ze heeft een conflict gehad met een collega en geleerd dat hoe je een conflict oplost meer zegt over je karakter dan het feit dat het conflict er was.", thema: "werk" },
+    { text: "Hij vraagt zich af wat voor collega hij wil zijn, niet alleen wat voor functie hij wil hebben, en beseft dat het antwoord op die vraag bepaalt hoe hij zich elke dag gedraagt op de werkvloer.", thema: "werk" },
+    { text: "Ze heeft gemerkt dat mensen op de werkvloer haar serieuzer nemen als ze rustig en duidelijk communiceert, en dat ze die vaardigheid bewust wil blijven ontwikkelen.", thema: "werk" },
+    { text: "Hij kijkt terug op zijn eerste stage en ziet nu hoe veel hij heeft geleerd, niet alleen over het vak, maar over zichzelf, over samenwerken en over wat hij wil in zijn werkend leven.", thema: "werk" },
+    // Vrienden & relaties
+    { text: "Ze heeft mensen in haar leven die haar kennen zoals ze is als ze moe is, als ze zich onzeker voelt, als ze het even niet meer weet, en dat is precies waarom ze zo veel voor haar betekenen.", thema: "vrienden" },
+    { text: "Hij heeft geleerd dat echte vriendschap niet betekent dat je het altijd eens bent, maar dat je de ander respecteert genoeg om eerlijk te zijn, ook als dat moeilijk is.", thema: "vrienden" },
+    { text: "Ze heeft een periode gehad waarin ze zich omringd voelde door mensen maar zich diep vanbinnen erg alleen voelde, en die ervaring heeft haar geleerd wat ze echt zoekt in relaties.", thema: "vrienden" },
+    { text: "Hij begrijpt nu dat de manier waarop hij met anderen omgaat een directe weerspiegeling is van de manier waarop hij met zichzelf omgaat, en dat beide aandacht verdienen.", thema: "vrienden" },
+    { text: "Ze heeft vrienden die er al jaren zijn en vrienden die ze pas kent, en heeft geleerd dat de lengte van een vriendschap niets zegt over de diepte ervan.", thema: "vrienden" },
+    { text: "Hij heeft iemand laten gaan die hem niet goed behandelde, ook al was het moeilijk, en heeft ontdekt dat ruimte maken voor jezelf geen egoïsme is maar een noodzaak.", thema: "vrienden" },
+  ]
+};
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Bijhouden welke teksten al gebruikt zijn per niveau
+const gebruiktPerNiveau = { 0: [], 1: [], 2: [], 3: [], 4: [] };
+
+function getNextText() {
+  const lvl = state.currentLevel;
+  const alle = TEKSTEN[lvl];
+  let beschikbaar = alle.map((_, i) => i).filter(i => !gebruiktPerNiveau[lvl].includes(i));
+  if (beschikbaar.length === 0) {
+    gebruiktPerNiveau[lvl] = [];
+    beschikbaar = alle.map((_, i) => i);
+  }
+  const idx = beschikbaar[Math.floor(Math.random() * beschikbaar.length)];
+  gebruiktPerNiveau[lvl].push(idx);
+  const entry = alle[idx];
+  return { text: entry.text, author: entry.thema };
+}
+
+const FEEDBACK = {
+  excellent: [
+    "Zo werkt het. Lekker bezig.",
+    "Scherp getypt. Ga zo door.",
+    "Top snelheid en bijna geen fouten. Goed gedaan.",
+  ],
+  good: [
+    "Goed tempo. Blijf oefenen en het gaat vanzelf sneller.",
+    "Netjes. Elke oefening telt.",
+    "Aardig werk. Je zit op de goede weg.",
+  ],
+  ok: [
+    "Rustig aan, dat is prima. Nauwkeurigheid gaat voor snelheid.",
+    "Niet erg als het langzaam gaat. Herhaling helpt.",
+    "Let op de fouten en probeer het opnieuw.",
+  ],
+  poor: [
+    "Het gaat langzamer dan je wil, maar dat hoort erbij aan het begin.",
+    "Geen punt. De volgende oefening gaat beter.",
+    "Doorzetten is het enige wat werkt. Probeer het nog een keer.",
+  ]
+};
+
+// =====================
+// STATE
+// =====================
+let state = {
+  currentLevel: 0,
+  currentText: '',
+  currentAuthor: '',
+  typedIndex: 0,
+  errors: 0,
+  totalErrors: 0,
+  startTime: null,
+  timerInterval: null,
+  wpm: 0,
+  isActive: false,
+  isComplete: false,
+  streak: 0,
+  totalCompleted: 0,
+  // Sessie-totalen
+  sessionWPMs: [],
+  sessionErrors: 0,
+  sessionChars: 0,
+  // Metingen
+  fase: 'begin',         // 'begin' | 'midden' | 'eind' | 'klaar'
+  beginMetingWPMs: [],
+  beginMetingAcc: [],
+  eindMetingWPMs: [],
+  eindMetingAcc: [],
+  beginWPM: null,
+  beginAcc: null,
+};
+
+// =====================
+// INIT
+// =====================
+function init() {
+  renderLevelDots();
+  renderText();
+  setupInput();
+}
+
+function renderLevelDots() {
+  const container = document.getElementById('level-dots');
+  container.innerHTML = '';
+  for (let i = 0; i < LEVELS.length; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'level-dot' + (i <= state.currentLevel ? ' active' : '');
+    container.appendChild(dot);
+  }
+  document.getElementById('level-name').textContent = LEVELS[state.currentLevel].name;
+}
+
+function renderText() {
+  const entry = getNextText();
+  state.currentText = entry.text;
+  state.currentAuthor = entry.author;
+  state.typedIndex = 0;
+  state.errors = 0;
+  state.isActive = false;
+  state.isComplete = false;
+  clearInterval(state.timerInterval);
+
+  document.getElementById('philosopher-display').innerHTML =
+    `<span>${entry.author}</span>`;
+
+  // Fase-indicator
+  const faseEl = document.getElementById('fase-indicator');
+  const totaal = TEKSTEN[state.currentLevel].length;
+  const eindStart = totaal - 3;
+  if (state.fase === 'begin') {
+    faseEl.textContent = `Beginmeting — oefening ${state.totalCompleted + 1} van 3`;
+  } else if (state.fase === 'eind') {
+    const eindNr = state.eindMetingWPMs.length + 1;
+    faseEl.textContent = `Eindmeting — oefening ${eindNr} van 3`;
+  } else {
+    faseEl.textContent = '';
+  }
+
+  const display = document.getElementById('text-display');
+  display.innerHTML = state.currentText.split('').map((ch, i) =>
+    `<span class="char pending${i === 0 ? ' cursor' : ''}" data-i="${i}">${ch === ' ' ? '&nbsp;' : ch}</span>`
+  ).join('');
+
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('timer-display').textContent = '0:00';
+  document.getElementById('results-screen').classList.remove('show');
+
+  // Focus input direct — geen klik nodig
+  document.getElementById('typing-input').focus();
+
+  updateStats();
+}
+
+function setupInput() {
+  const input = document.getElementById('typing-input');
+  // Heractiveer focus als ergens op de pagina geklikt wordt
+  document.addEventListener('click', () => input.focus());
+  input.addEventListener('keydown', handleKeydown);
+  input.addEventListener('input', handleInput);
+}
+
+function handleKeydown(e) {
+  if (state.isComplete) return;
+
+  // Start timer on first keypress
+  if (!state.isActive && state.typedIndex === 0) {
+    state.isActive = true;
+    state.startTime = Date.now();
+    state.timerInterval = setInterval(updateTimer, 200);
+  }
+
+  if (e.key === 'Backspace') {
+    e.preventDefault();
+    if (state.typedIndex > 0) {
+      state.typedIndex--;
+      const chars = document.querySelectorAll('.char');
+      chars[state.typedIndex].classList.remove('correct', 'error');
+      chars[state.typedIndex].classList.add('pending', 'cursor');
+      if (state.typedIndex + 1 < chars.length) {
+        chars[state.typedIndex + 1].classList.remove('cursor');
+      }
+      updateProgress();
+    }
+    return;
+  }
+}
+
+function handleInput(e) {
+  if (state.isComplete) return;
+  const input = document.getElementById('typing-input');
+  const val = input.value;
+  if (!val) return;
+  input.value = '';
+
+  const ch = val[val.length - 1];
+  processChar(ch);
+}
+
+function processChar(ch) {
+  const chars = document.querySelectorAll('.char');
+  const expected = state.currentText[state.typedIndex];
+
+  // Remove cursor from current
+  chars[state.typedIndex].classList.remove('cursor', 'pending');
+
+  if (ch === expected) {
+    chars[state.typedIndex].classList.add('correct');
+  } else {
+    chars[state.typedIndex].classList.add('error');
+    state.errors++;
+    state.totalErrors++;
+  }
+
+  state.typedIndex++;
+
+  // Move cursor
+  if (state.typedIndex < chars.length) {
+    chars[state.typedIndex].classList.add('cursor');
+    chars[state.typedIndex].classList.remove('pending');
+    // Scroll into view
+    chars[state.typedIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  updateProgress();
+  updateStats();
+
+  if (state.typedIndex >= state.currentText.length) {
+    completeExercise();
+  }
+}
+
+function updateTimer() {
+  if (!state.startTime || state.isComplete) return;
+  const elapsed = (Date.now() - state.startTime) / 1000;
+  const mins = Math.floor(elapsed / 60);
+  const secs = Math.floor(elapsed % 60);
+  document.getElementById('timer-display').textContent =
+    `${mins}:${secs.toString().padStart(2, '0')}`;
+
+  // Live WPM
+  const words = state.typedIndex / 5;
+  state.wpm = Math.round(words / (elapsed / 60)) || 0;
+  document.getElementById('wpm-display').textContent = state.wpm;
+}
+
+function updateProgress() {
+  const pct = (state.typedIndex / state.currentText.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function updateStats() {
+  // Huidige oefening nauwkeurigheid
+  const total = state.typedIndex;
+  const acc = total > 0 ? Math.round(((total - state.errors) / total) * 100) : 100;
+  document.getElementById('accuracy-display').textContent = acc + '%';
+  document.getElementById('streak-display').textContent = state.streak;
+  document.getElementById('total-display').textContent = state.totalCompleted;
+}
+
+function completeExercise() {
+  clearInterval(state.timerInterval);
+  state.isComplete = true;
+  state.isActive = false;
+
+  const elapsed = (Date.now() - state.startTime) / 1000;
+  const words = state.currentText.split(' ').length;
+  const finalWPM = Math.round(words / (elapsed / 60));
+  const totalChars = state.typedIndex;
+  const accuracy = Math.round(((totalChars - state.errors) / totalChars) * 100);
+
+  state.wpm = finalWPM;
+  state.totalCompleted++;
+  state.streak++;
+
+  // Sessie-totalen bijhouden
+  state.sessionWPMs.push(finalWPM);
+  state.sessionErrors += state.errors;
+  state.sessionChars += totalChars;
+
+  // Gemiddelde WPM tonen
+  const avgWPM = Math.round(state.sessionWPMs.reduce((a,b) => a+b, 0) / state.sessionWPMs.length);
+  document.getElementById('wpm-display').textContent = avgWPM;
+
+  // ---- METINGEN ----
+  if (state.fase === 'begin') {
+    state.beginMetingWPMs.push(finalWPM);
+    state.beginMetingAcc.push(accuracy);
+    if (state.beginMetingWPMs.length >= 3) {
+      // Beginmeting afronden
+      state.beginWPM = Math.round(state.beginMetingWPMs.reduce((a,b)=>a+b,0) / 3);
+      state.beginAcc = Math.round(state.beginMetingAcc.reduce((a,b)=>a+b,0) / 3);
+      // Toon baseline balk
+      const bar = document.getElementById('baseline-bar');
+      bar.style.display = 'flex';
+      document.getElementById('baseline-wpm-label').textContent = state.beginWPM + ' WPM';
+      document.getElementById('baseline-acc-label').textContent = state.beginAcc + '%';
+      state.fase = 'midden';
+    }
+  }
+
+  const totaal = TEKSTEN[state.currentLevel].length;
+  // Eindmeting starten als er nog 3 over zijn
+  const gebruiktAantal = gebruiktPerNiveau[state.currentLevel].length;
+  if (state.fase === 'midden' && gebruiktAantal >= totaal - 3) {
+    state.fase = 'eind';
+  }
+
+  if (state.fase === 'eind') {
+    state.eindMetingWPMs.push(finalWPM);
+    state.eindMetingAcc.push(accuracy);
+    if (state.eindMetingWPMs.length >= 3) {
+      state.fase = 'klaar';
+    }
+  }
+
+  // Korte grade feedback
+  let grade, feedbackKey;
+  if (accuracy >= 97 && finalWPM >= LEVELS[state.currentLevel].targetWPM) {
+    grade = '✓ Uitstekend!'; feedbackKey = 'excellent';
+  } else if (accuracy >= 92 && finalWPM >= LEVELS[state.currentLevel].minWPM) {
+    grade = '✓ Goed!'; feedbackKey = 'good';
+  } else if (accuracy >= 85) {
+    grade = '~ Aardig'; feedbackKey = 'ok';
+  } else {
+    grade = '✗ Blijf oefenen'; feedbackKey = 'poor';
+    state.streak = 0;
+  }
+
+  const feedbackArr = FEEDBACK[feedbackKey];
+  const feedback = feedbackArr[Math.floor(Math.random() * feedbackArr.length)];
+
+  document.getElementById('result-grade').textContent = `${grade} — ${finalWPM} WPM, ${accuracy}% nauwkeurig`;
+  document.getElementById('result-feedback').textContent = feedback;
+  document.getElementById('results-screen').classList.add('show');
+
+  updateStats();
+  checkLevelUp(finalWPM, accuracy);
+
+  if (state.fase === 'klaar') {
+    // Toon progressierapport
+    setTimeout(() => toonProgressierapport(), 1800);
+  } else {
+    setTimeout(() => {
+      state.errors = 0;
+      state.totalErrors = 0;
+      renderText();
+    }, 1800);
+  }
+}
+
+function toonProgressierapport() {
+  const eindWPM = Math.round(state.eindMetingWPMs.reduce((a,b)=>a+b,0) / state.eindMetingWPMs.length);
+  const eindAcc = Math.round(state.eindMetingAcc.reduce((a,b)=>a+b,0) / state.eindMetingAcc.length);
+  const diffWPM = eindWPM - state.beginWPM;
+  const diffAcc = eindAcc - state.beginAcc;
+
+  document.getElementById('pr-start-wpm').textContent = state.beginWPM;
+  document.getElementById('pr-start-acc').textContent = state.beginAcc + '%';
+  document.getElementById('pr-end-wpm').textContent = eindWPM;
+  document.getElementById('pr-end-acc').textContent = eindAcc + '%';
+  document.getElementById('pr-diff-wpm').textContent = (diffWPM >= 0 ? '+' : '') + diffWPM;
+  document.getElementById('pr-diff-acc').textContent = (diffAcc >= 0 ? '+' : '') + diffAcc + '%';
+
+  let msg;
+  if (diffWPM >= 5) msg = 'Duidelijke vooruitgang. Je typt aan het einde van de sessie sneller dan aan het begin.';
+  else if (diffWPM >= 0) msg = 'Stabiele prestatie. Meer oefening leidt tot meer groei.';
+  else msg = 'Je was aan het einde iets langzamer. Dat kan. Concentratie kost energie.';
+
+  document.getElementById('pr-message').textContent = msg;
+  document.getElementById('progress-report').style.display = 'block';
+  document.getElementById('typing-card').style.display = 'none';
+  document.getElementById('results-screen').classList.remove('show');
+  document.getElementById('main-controls').style.display = 'none';
+  document.getElementById('fase-indicator').textContent = '';
+}
+
+function checkLevelUp(wpm, accuracy) {
+  const lvl = state.currentLevel;
+  if (lvl < LEVELS.length - 1 && wpm >= LEVELS[lvl].targetWPM && accuracy >= 93) {
+    state.currentLevel++;
+    renderLevelDots();
+    const msg = document.getElementById('level-up-msg');
+    document.getElementById('level-up-text').textContent =
+      `Niveau ontgrendeld: ${LEVELS[state.currentLevel].name}! Je typt als een filosoof.`;
+    msg.classList.add('show');
+  }
+}
+
+function nextExercise() {
+  state.errors = 0;
+  state.totalErrors = 0;
+  renderText();
+}
+
+function resetSession() {
+  state.streak = 0;
+  state.totalCompleted = 0;
+  state.sessionWPMs = [];
+  state.sessionErrors = 0;
+  state.sessionChars = 0;
+  state.errors = 0;
+  state.totalErrors = 0;
+  state.fase = 'begin';
+  state.beginMetingWPMs = [];
+  state.beginMetingAcc = [];
+  state.eindMetingWPMs = [];
+  state.eindMetingAcc = [];
+  state.beginWPM = null;
+  state.beginAcc = null;
+  // Reset gebruikte teksten
+  Object.keys(gebruiktPerNiveau).forEach(k => gebruiktPerNiveau[k] = []);
+  document.getElementById('wpm-display').textContent = '0';
+  document.getElementById('baseline-bar').style.display = 'none';
+  document.getElementById('progress-report').style.display = 'none';
+  document.getElementById('typing-card').style.display = 'block';
+  document.getElementById('main-controls').style.display = 'flex';
+  document.getElementById('fase-indicator').textContent = '';
+  renderText();
+}
+
+function changeLevel(dir) {
+  const newLevel = state.currentLevel + dir;
+  if (newLevel < 0 || newLevel >= LEVELS.length) return;
+  state.currentLevel = newLevel;
+  renderLevelDots();
+  state.errors = 0;
+  state.totalErrors = 0;
+  renderText();
+}
+
+// =====================
+// START
+// =====================
+init();
+</script>
+</body>
+</html>
